@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Without Redux</title>
+    <style>
+        .container{
+            border: 5px solid black;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="red" class="container"></div>
+    <div id="green" class="container"></div>
+    <div id="blue" class="container"></div>
+
+    <script>
+        document.querySelector('#red').innerHTML =`
+            <h1>red</h1>
+            <input type="button" value="red" onclick="
+                document.querySelector('#red').style.backgroundColor = 'red';
+                document.querySelector('#green').style.backgroundColor = 'red';
+                document.querySelector('#blue').style.backgroundColor = 'red';
+            " />
+        `
+
+        document.querySelector('#green').innerHTML =`
+            <h1>green</h1>
+            <input type="button" value="green" onclick="
+                document.querySelector('#red').style.backgroundColor = 'green';
+                document.querySelector('#green').style.backgroundColor = 'green';
+                document.querySelector('#blue').style.backgroundColor = 'green';
+            " />
+        `
+
+        document.querySelector('#blue').innerHTML =`
+            <h1>blue</h1>
+            <input type="button" value="blue" onclick="
+                document.querySelector('#red').style.backgroundColor = 'blue';
+                document.querySelector('#green').style.backgroundColor = 'blue';
+                document.querySelector('#blue').style.backgroundColor = 'blue';
+            " />
+        `
+
+
+    </script>
+</body>
+</html>
