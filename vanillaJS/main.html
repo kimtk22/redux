@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.2.1/redux.min.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="subject"></div>
+    <div id="toc"></div>
+    <div id="control"></div>
+    <div id="article"></div>
+    
+
+    <script>
+        function subject(){
+            document.querySelector("#subject").innerHTML=`
+                <header>
+                    <h1>WEB</h1>
+                    Hello, WEB!
+                </header>
+            `;
+        }
+        function TOC(){
+            const state = store.getState();
+            let liTags = '';
+
+            state.contents.forEach(value => {
+                liTags += `
+                    <li>
+                        <a href="1.${value.title}" onclick="
+                            store.dispatch({type: 'CHANGE_SELECTED_ID', selectedId: ${value.id}});
+                            return false;
+                        ">${value.title}</a>
+                    </li>
+                `;
+            });
+
+            document.querySelector("#toc").innerHTML=`
+                <nav>
+                    <ol>${liTags}</ol>
+                </nav>
+            `;
+        }
+
+        function control(){
+            const state = store.getState();
+            document.querySelector("#control").innerHTML=`
+                <ul>
+                    <li><a href="/create" onclick="
+                        event.preventDefault();
+                        store.dispatch({type: 'CHANGE_MODE', mode: 'create'});
+                    ">create</a></li>
+                    <li><input type="button" value="delete" onclick="
+                        store.dispatch({type: 'DELETE', id: ${state.selectedId}});
+                    "></li>
+                </ul>
+            `;
+        }
+
+        function article(){
+            const state = store.getState();
+
+            if(state.mode === 'create'){
+                document.querySelector("#article").innerHTML=`
+                    <form onsubmit="
+                        event.preventDefault();
+                        const id = store.getState().nextId;
+                        const title = event.target.title.value;
+                        const desc = event.target.desc.value;
+
+                        store.dispatch({type: 'CREATE', content: {id: id, title: title, desc: desc}});
+                        store.dispatch({type: 'CHANGE_MODE', mode: 'read'});
+                        store.dispatch({type: 'CHANGE_NEXT_ID', nextId: id + 1});
+                    ">
+                        <p><input type="text" id="title" placeholder="제목"></p>
+                        <p><textarea id="desc" placeholder="내용"></textarea></p>
+                        <input type="submit" value="create">
+                        <input type="button" value="cancel" onclick="store.dispatch({type: 'CHANGE_MODE', mode: 'read'})">
+                    </form>
+                `;
+            }else if(state.mode === 'read'){
+                const selectedObject = state.contents.find(content => content.id === state.selectedId);
+
+                document.querySelector("#article").innerHTML=`
+                    <article>
+                        <h2>${selectedObject ? selectedObject.title : ''}</h2>
+                        ${selectedObject ? selectedObject.desc : ''}
+                    </article>
+                `;
+            }
+
+
+            
+        }
+
+        function reducer(state, action){
+            if(!state){
+                return {
+                    mode: 'read',
+                    contents: [
+                        {id:1, title: 'HTML', desc: 'HTML is ...'},
+                        {id:2, title: 'CSS', desc: 'CSS is ...'}
+                    ],
+                    selectedId: 1,
+                    nextId: 3
+                };
+            }
+
+            if(action.type === 'CHANGE_SELECTED_ID'){
+                return {...state, selectedId: action.selectedId};
+            }else if(action.type === 'CHANGE_MODE'){
+                return {...state, mode: action.mode};
+            }else if(action.type === 'CREATE'){
+                const newContents = [...state.contents, action.content];
+                return {...state, contents: newContents};
+            }else if(action.type === 'CHANGE_NEXT_ID'){
+                return {...state, nextId: action.nextId};
+            }else if(action.type === 'DELETE'){
+                const id = action.id;
+                const newContents = state.contents.filter(content => content.id !== id);
+                const selectedId = newContents[0] ? newContents[0].id : null;
+                return {...state, contents: newContents, selectedId: selectedId};
+            }
+            
+        }
+        const store = Redux.createStore(reducer);
+
+        store.subscribe(subject);
+        store.subscribe(TOC);
+        store.subscribe(control);
+        store.subscribe(article);
+
+        subject();
+        TOC();
+        control();
+        article();
+    </script>
+</body>
+</html>
