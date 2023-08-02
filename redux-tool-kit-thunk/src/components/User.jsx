@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { userSlice } from '../redux/slice/userSlice';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { userSlice } from "../redux/slice/userSlice";
+import { asyncUserFetch } from "../redux/thunk";
 
 export const User = () => {
   const user = useSelector((state) => state.user);
@@ -11,12 +12,7 @@ export const User = () => {
   }, []);
 
   const fetchUser = async () => {
-    const ramdom = Math.floor(Math.random() * 10) || 1;
-    const res = await fetch(
-      `https://jsonplaceholder.typicode.com/users/${ramdom}`
-    );
-    const user = await res.json();
-    dispatch(userSlice.actions.setUser(user));
+    dispatch(asyncUserFetch());
   };
 
   return (
